@@ -1,0 +1,43 @@
+@keyframes dashFlow {
+  0% {
+    stroke-dashoffset: 16;
+  }
+  100% {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes internetFlow {
+  0% {
+    stroke-dashoffset: 10;
+  }
+  100% {
+    stroke-dashoffset: 0;
+  }
+}
+
+.react-flow__edge.active-flow path.react-flow__edge-path {
+  stroke-dasharray: 8 8;
+  animation: dashFlow 0.5s linear infinite;
+  filter: drop-shadow(0 0 4px currentColor);
+}
+
+.react-flow__edge.inactive-flow path.react-flow__edge-path {
+  stroke-dasharray: 5 5;
+}
+
+.react-flow__edge.internet-server-flow-active path.react-flow__edge-path {
+  stroke-dasharray: 5 5;
+  animation: internetFlow 1s linear infinite;
+}
+
+.react-flow__edge.internet-server-flow-inactive path.react-flow__edge-path {
+  stroke-dasharray: 5 5;
+}
+
+.react-flow__edge path.react-flow__edge-path {
+  transition:
+    stroke 0.3s ease,
+    stroke-width 0.3s ease,
+    opacity 0.3s ease;
+}
