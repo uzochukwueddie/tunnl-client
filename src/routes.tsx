@@ -1,51 +1,114 @@
+import { lazy, Suspense } from 'react';
 import { Navigate, useRoutes } from 'react-router-dom';
-import { Home } from './pages/Home';
-import { Register } from './pages/auth/Register';
-import { Login } from './pages/auth/Login';
-import { DashboardLayout } from './layouts/DashboardLayout';
-import { Overview } from './pages/dashboard/Overview';
-import { Tokens } from './pages/dashboard/Tokens';
-import { Tunnels } from './pages/dashboard/Tunnels';
-import { TunnelDetails } from './pages/dashboard/TunnelDetails';
+import { LoadingSpinner } from './components/shared/LoadingSpinner';
 import { ProtectedRoute } from './components/shared/ProtectedRoute';
-import { ConnectionMapPage } from './pages/dashboard/ConnectionMapPage';
+
+// Lazy-loaded page components
+const Home = lazy(() => import('./pages/Home').then((m) => ({ default: m.Home })));
+const Login = lazy(() => import('./pages/auth/Login').then((m) => ({ default: m.Login })));
+const Register = lazy(() => import('./pages/auth/Register').then((m) => ({ default: m.Register })));
+const DashboardLayout = lazy(() => import('./layouts/DashboardLayout').then((m) => ({ default: m.DashboardLayout })));
+const Overview = lazy(() => import('./pages/dashboard/Overview').then((m) => ({ default: m.Overview })));
+const Tokens = lazy(() => import('./pages/dashboard/Tokens').then((m) => ({ default: m.Tokens })));
+const Tunnels = lazy(() => import('./pages/dashboard/Tunnels').then((m) => ({ default: m.Tunnels })));
+const TunnelDetails = lazy(() => import('./pages/dashboard/TunnelDetails').then((m) => ({ default: m.TunnelDetails })));
+const ConnectionMapPage = lazy(() =>
+  import('./pages/dashboard/ConnectionMapPage').then((m) => ({ default: m.ConnectionMapPage }))
+);
+
+function PageFallback() {
+  return <LoadingSpinner text="Loading..." />;
+}
 
 export function AppRoutes() {
   const routes = useRoutes([
     {
       path: '/',
-      element: <Home />
+      element: (
+        <Suspense fallback={<PageFallback />}>
+          <Home />
+        </Suspense>
+      )
     },
     {
       path: '/auth/login',
-      element: <Login />
+      element: (
+        <Suspense fallback={<PageFallback />}>
+          <Login />
+        </Suspense>
+      )
     },
     {
       path: '/auth/register',
-      element: <Register />
+      element: (
+        <Suspense fallback={<PageFallback />}>
+          <Register />
+        </Suspense>
+      )
     },
     {
       path: '/dashboard',
       element: (
         <ProtectedRoute>
-          <DashboardLayout />
+          <Suspense fallback={<PageFallback />}>
+            <DashboardLayout />
+          </Suspense>
         </ProtectedRoute>
       ),
       children: [
-        { index: true, element: <Overview /> },
-        { path: 'tokens', element: <Tokens /> },
-        { path: 'tunnels', element: <Tunnels /> },
-        { path: 'tunnels/:id', element: <TunnelDetails /> }
+        {
+          index: true,
+          element: (
+            <Suspense fallback={<PageFallback />}>
+              <Overview />
+            </Suspense>
+          )
+        },
+        {
+          path: 'tokens',
+          element: (
+            <Suspense fallback={<PageFallback />}>
+              <Tokens />
+            </Suspense>
+          )
+        },
+        {
+          path: 'tunnels',
+          element: (
+            <Suspense fallback={<PageFallback />}>
+              <Tunnels />
+            </Suspense>
+          )
+        },
+        {
+          path: 'tunnels/:id',
+          element: (
+            <Suspense fallback={<PageFallback />}>
+              <TunnelDetails />
+            </Suspense>
+          )
+        }
       ]
     },
     {
       path: '/dashboard/connection-map',
       element: (
         <ProtectedRoute>
-          <ConnectionMapPage />
+          <Suspense fallback={<PageFallback />}>
+            <ConnectionMapPage />
+          </Suspense>
         </ProtectedRoute>
       ),
-      children: [{ path: ':tunnelId', element: <ConnectionMapPage /> }]
+      children: [
+        {
+          path: ':tunnelId',
+          element: (
+            <Suspense fallback={<PageFallback />}>
+              <ConnectionMapPage />
+            </Suspense>
+          )
+        }
+      ]
     },
     {
       path: '*',

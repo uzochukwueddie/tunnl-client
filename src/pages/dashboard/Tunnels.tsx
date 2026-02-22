@@ -1,10 +1,27 @@
-import { useCallback, useEffect, useOptimistic, useState, useTransition, type ReactElement } from 'react';
-import { TunnelTabs } from '../../components/pages/dashboard/tunnels/TunnelTabs';
+import {
+  lazy,
+  Suspense,
+  useCallback,
+  useEffect,
+  useOptimistic,
+  useState,
+  useTransition,
+  type ReactElement
+} from 'react';
 import type { ActiveandHistoryTunnel, TabType, Tunnel } from '../../types';
-import { TunnelList } from '../../components/pages/dashboard/tunnels/TunnelList';
 import { HardDrive } from 'lucide-react';
 import { tunnelService } from '../../services/tunnel.service';
-import { ConfirmationModal } from '../../components/shared/ConfirmationModal';
+import { TunnelSkeleton } from '../../components/pages/dashboard/overview/StatsSkeleton';
+
+const TunnelTabs = lazy(() =>
+  import('../../components/pages/dashboard/tunnels/TunnelTabs').then((m) => ({ default: m.TunnelTabs }))
+);
+const TunnelList = lazy(() =>
+  import('../../components/pages/dashboard/tunnels/TunnelList').then((m) => ({ default: m.TunnelList }))
+);
+const ConfirmationModal = lazy(() =>
+  import('../../components/shared/ConfirmationModal').then((m) => ({ default: m.ConfirmationModal }))
+);
 
 async function loadTunnelData() {
   const [activeTunnelRes, historyTunnelRes] = await Promise.all([
@@ -89,52 +106,60 @@ export function Tunnels(): ReactElement {
         <p className="text-slate-400 mt-1">Manage and monitor your tunnel connections</p>
       </div>
 
-      <TunnelTabs
-        activeTab={activeTab}
-        activeTunnelsCount={tunnels.activeTunnels.length}
-        onTabChange={handleTabChange}
-      />
+      <Suspense fallback={null}>
+        <TunnelTabs
+          activeTab={activeTab}
+          activeTunnelsCount={tunnels.activeTunnels.length}
+          onTabChange={handleTabChange}
+        />
+      </Suspense>
 
       {activeTab === 'active' && (
         <div className="card">
-          <TunnelList
-            tunnels={tunnels.activeTunnels}
-            loading={isPendingTransition}
-            isActive={true}
-            emptyIcon={<HardDrive className="w-10 h-10 text-slate-600" />}
-            emptyTitle="No Active Tunnels"
-            emptyDescription="Start a tunnel to it appear here"
-          />
+          <Suspense fallback={<TunnelSkeleton />}>
+            <TunnelList
+              tunnels={tunnels.activeTunnels}
+              loading={isPendingTransition}
+              isActive={true}
+              emptyIcon={<HardDrive className="w-10 h-10 text-slate-600" />}
+              emptyTitle="No Active Tunnels"
+              emptyDescription="Start a tunnel to it appear here"
+            />
+          </Suspense>
         </div>
       )}
 
       {activeTab === 'history' && (
         <div className="card">
-          <TunnelList
-            tunnels={optimisticHistory}
-            loading={isPendingTransition}
-            isActive={false}
-            emptyIcon={<HardDrive className="w-10 h-10 text-slate-600" />}
-            emptyTitle="No Tunnel History"
-            emptyDescription="Your tunnel history will appear here"
-            onDelete={confirmDelete}
-            deletingInProgress={isPendingDelete}
-          />
+          <Suspense fallback={<TunnelSkeleton />}>
+            <TunnelList
+              tunnels={optimisticHistory}
+              loading={isPendingTransition}
+              isActive={false}
+              emptyIcon={<HardDrive className="w-10 h-10 text-slate-600" />}
+              emptyTitle="No Tunnel History"
+              emptyDescription="Your tunnel history will appear here"
+              onDelete={confirmDelete}
+              deletingInProgress={isPendingDelete}
+            />
+          </Suspense>
         </div>
       )}
 
-      <ConfirmationModal
-        isOpen={!!tunnelToDelete}
-        title="Delete Token?"
-        message={`Are you sure you want to delete the tunnel "${tunnelToDelete?.subdomain}"?`}
-        description="This action cannot be undone. The tunnel will be permanently removed from your account."
-        confirmText={isPendingDelete ? 'Deleting...' : 'Delete Tunnel'}
-        cancelText="Cancel"
-        onConfirm={deleteTunnel}
-        onCancel={cancelDelete}
-        isLoading={isPendingDelete}
-        variant="danger"
-      />
+      <Suspense fallback={null}>
+        <ConfirmationModal
+          isOpen={!!tunnelToDelete}
+          title="Delete Token?"
+          message={`Are you sure you want to delete the tunnel "${tunnelToDelete?.subdomain}"?`}
+          description="This action cannot be undone. The tunnel will be permanently removed from your account."
+          confirmText={isPendingDelete ? 'Deleting...' : 'Delete Tunnel'}
+          cancelText="Cancel"
+          onConfirm={deleteTunnel}
+          onCancel={cancelDelete}
+          isLoading={isPendingDelete}
+          variant="danger"
+        />
+      </Suspense>
     </div>
   );
 }
