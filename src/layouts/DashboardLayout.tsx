@@ -2,16 +2,8 @@ import { Zap } from 'lucide-react';
 import type { DashboardLayoutProps } from '../types';
 import { tunnelService } from '../services/tunnel.service';
 import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
-import { use, useCallback, useMemo, useTransition } from 'react';
+import { useCallback, useEffect, useMemo, useState, useTransition } from 'react';
 import { useAuth } from '../hooks/useAuth';
-
-const firstTunnelPromise = tunnelService
-  .getActiveTunnels()
-  .then((response) => (response.result.length > 0 ? response.result[0].id : null))
-  .catch((err) => {
-    console.log('Failed to load tunnels:', err);
-    return null;
-  });
 
 export function DashboardLayout({ children }: DashboardLayoutProps) {
   const location = useLocation();
@@ -19,8 +11,35 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
   const { logout, user } = useAuth();
 
   const [isPendingLogout, startLogoutTransition] = useTransition();
+  const [firstTunnelId, setFirstTunnelId] = useState<string | null>(null);
 
-  const firstTunnelId = use(firstTunnelPromise);
+  useEffect(() => {
+    const fetchFirstTunnel = () => {
+      tunnelService
+        .getActiveTunnels()
+        .then((response) => {
+          setFirstTunnelId(response.result.length > 0 ? response.result[0].id : null);
+        })
+        .catch((err) => {
+          console.log('Failed to load tunnels:', err);
+          setFirstTunnelId(null);
+        });
+    };
+
+    fetchFirstTunnel();
+
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        fetchFirstTunnel();
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, []);
 
   const handleLogout = useCallback(() => {
     startLogoutTransition(async () => {
