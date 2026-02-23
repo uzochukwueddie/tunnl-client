@@ -1,9 +1,8 @@
-import { lazy, Suspense, useCallback, useEffect, useMemo, type ReactElement } from 'react';
+import { lazy, useCallback, useEffect, useMemo, type ReactElement } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useTunnelRealTimeEvents } from '../../hooks/useTunnelRealTimeEvents';
 import { tunnelWebsocketService } from '../../services/socket-connections/tunnels-websocket.service';
 import { monitoringWebsocketService } from '../../services/socket-connections/monitoring-webscoket.service';
-import { LoadingSpinner } from '../../components/shared/LoadingSpinner';
 
 const TunnelSelector = lazy(() =>
   import('../../components/pages/dashboard/connection-map/TunnelSelector').then((m) => ({
@@ -67,9 +66,7 @@ export function ConnectionMapPage(): ReactElement {
       <div className="flex-1 flex overflow-hidden">
         {/* Left Panel - Tunnel Selector */}
         <aside className="w-80 shrink-0">
-          <Suspense fallback={<LoadingSpinner text="Loading tunnels..." />}>
-            <TunnelSelector tunnels={tunnels} selectedTunnelId={selectedTunnelId} onSelectTunnel={handleSelectTunnel} />
-          </Suspense>
+          <TunnelSelector tunnels={tunnels} selectedTunnelId={selectedTunnelId} onSelectTunnel={handleSelectTunnel} />
         </aside>
 
         {/* Center Panel - Connection Map */}
@@ -91,9 +88,7 @@ export function ConnectionMapPage(): ReactElement {
               </div>
             </div>
           ) : (
-            <Suspense fallback={<LoadingSpinner text="Loading map..." />}>
-              <ConnectionMap activeTunnelStatus={tunnelStatus} />
-            </Suspense>
+            <ConnectionMap activeTunnelStatus={tunnelStatus} />
           )}
         </main>
       </div>

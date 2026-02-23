@@ -1,4 +1,3 @@
-import { Suspense } from 'react';
 import { Zap } from 'lucide-react';
 import type { DashboardLayoutProps } from '../types';
 import { tunnelService } from '../services/tunnel.service';
@@ -107,24 +106,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
         </div>
       </nav>
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <Suspense
-          fallback={
-            <div className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                {[1, 2, 3, 4].map((i) => (
-                  <div key={i} className="stat-card animate-pulse">
-                    <div className="h-4 bg-slate-800 rounded w-1/2 mb-4" />
-                    <div className="h-8 bg-slate-800 rounded w-3/4" />
-                  </div>
-                ))}
-              </div>
-            </div>
-          }
-        >
-          {children ?? <Outlet />}
-        </Suspense>
-      </main>
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">{children ?? <Outlet />}</main>
     </div>
   );
 }

@@ -1,13 +1,4 @@
-import {
-  lazy,
-  Suspense,
-  useActionState,
-  useEffect,
-  useOptimistic,
-  useState,
-  useTransition,
-  type ReactElement
-} from 'react';
+import { lazy, useActionState, useEffect, useOptimistic, useState, useTransition, type ReactElement } from 'react';
 import type { Token } from '../../types';
 import { tokenService } from '../../services/token.service';
 import { EmptyState } from '../../components/shared/EmptyState';
@@ -167,16 +158,12 @@ export function Tokens(): ReactElement {
         <p className="text-slate-400 mt-1">Manage your API authentication tokens</p>
       </div>
 
-      <Suspense fallback={null}>
-        <TokenForm formAction={createFormAction} isPending={isCreating} error={createState.error} />
-      </Suspense>
+      <TokenForm formAction={createFormAction} isPending={isCreating} error={createState.error} />
 
       {createState.success && createState.token && (
         <div className="card">
           <div className="card-body">
-            <Suspense fallback={null}>
-              <TokenSuccessAlert token={createState.token} copied={copied} onCopy={copyToken} />
-            </Suspense>
+            <TokenSuccessAlert token={createState.token} copied={copied} onCopy={copyToken} />
           </div>
         </div>
       )}
@@ -207,47 +194,41 @@ export function Tokens(): ReactElement {
             />
           ) : (
             <div className="divide-y divide-slate-800">
-              <Suspense fallback={null}>
-                {optimisticTokens.map((token) => (
-                  <TokenListItem key={token.id} token={token} onRevoke={confirmRevoke} onDelete={confirmDelete} />
-                ))}
-              </Suspense>
+              {optimisticTokens.map((token) => (
+                <TokenListItem key={token.id} token={token} onRevoke={confirmRevoke} onDelete={confirmDelete} />
+              ))}
             </div>
           )}
         </div>
       </div>
 
       {/* Revoke Confirmation Modal */}
-      <Suspense fallback={null}>
-        <ConfirmationModal
-          isOpen={!!tokenToRevoke}
-          title="Revoke Token?"
-          message={`Are you sure you want to revoke the token "${tokenToRevoke?.name}"?`}
-          description="This will change the token status to inactive. Any applications using this token will lose access."
-          confirmText={isRevokingToken ? 'Revoking...' : 'Revoke Token'}
-          cancelText="Cancel"
-          onConfirm={revokeToken}
-          onCancel={cancelRevoke}
-          isLoading={isRevokingToken}
-          variant="danger"
-        />
-      </Suspense>
+      <ConfirmationModal
+        isOpen={!!tokenToRevoke}
+        title="Revoke Token?"
+        message={`Are you sure you want to revoke the token "${tokenToRevoke?.name}"?`}
+        description="This will change the token status to inactive. Any applications using this token will lose access."
+        confirmText={isRevokingToken ? 'Revoking...' : 'Revoke Token'}
+        cancelText="Cancel"
+        onConfirm={revokeToken}
+        onCancel={cancelRevoke}
+        isLoading={isRevokingToken}
+        variant="danger"
+      />
 
       {/* Delete Confirmation Modal */}
-      <Suspense fallback={null}>
-        <ConfirmationModal
-          isOpen={!!tokenToDelete}
-          title="Delete Token?"
-          message={`Are you sure you want to delete the token "${tokenToDelete?.name}"?`}
-          description="This action cannot be undone. The token will be permanently removed from your account."
-          confirmText={isDeletingToken ? 'Deleting...' : 'Delete Token'}
-          cancelText="Cancel"
-          onConfirm={deleteToken}
-          onCancel={cancelDelete}
-          isLoading={isDeletingToken}
-          variant="danger"
-        />
-      </Suspense>
+      <ConfirmationModal
+        isOpen={!!tokenToDelete}
+        title="Delete Token?"
+        message={`Are you sure you want to delete the token "${tokenToDelete?.name}"?`}
+        description="This action cannot be undone. The token will be permanently removed from your account."
+        confirmText={isDeletingToken ? 'Deleting...' : 'Delete Token'}
+        cancelText="Cancel"
+        onConfirm={deleteToken}
+        onCancel={cancelDelete}
+        isLoading={isDeletingToken}
+        variant="danger"
+      />
     </div>
   );
 }
