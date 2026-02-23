@@ -91,24 +91,24 @@ export function AppRoutes() {
       ]
     },
     {
-      path: '/dashboard/connection-map/:tunnelId?',
+      path: '/dashboard/connection-map',
       element: (
         <ProtectedRoute>
           <Suspense fallback={<PageFallback />}>
             <ConnectionMapPage />
           </Suspense>
         </ProtectedRoute>
-      )
-      // children: [
-      //   {
-      //     path: ':tunnelId',
-      //     element: (
-      //       <Suspense fallback={<PageFallback />}>
-      //         <ConnectionMapPage />
-      //       </Suspense>
-      //     )
-      //   }
-      // ]
+      ),
+      children: [
+        {
+          path: ':tunnelId',
+          element: (
+            <Suspense fallback={<PageFallback />}>
+              <ConnectionMapPage />
+            </Suspense>
+          )
+        }
+      ]
     },
     {
       path: '*',
